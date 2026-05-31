@@ -1,0 +1,31 @@
+.node {
+  fill: #fff7ed;
+  stroke: #f97316;
+  stroke-width: 2;
+  cursor: pointer;
+  transition: 0.2s;
+  transform-box: fill-box;
+}
+.node:hover {
+  fill: #fed7aa;
+  transform: scale(1.08);
+}
+
+.node-label {
+  text-anchor: middle;
+  font-size: 16px;
+  font-weight: 600;
+  pointer-events: none;
+}
+.node.visited {
+  fill: #dbeafe;
+  stroke: #3b82f6;
+}
+.node.unvisited {
+    fill: #fff7ed;
+    stroke: #f97316;
+}
+.node.current {
+  fill: #fef3c7;
+  stroke: #f59e0b;
+}
