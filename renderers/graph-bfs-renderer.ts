@@ -1,5 +1,5 @@
 import { CANVAS, GRAPH, SVG } from "../shared/config.js";
-import { wait } from "../shared/fn.js";
+import { wait } from "../shared/svg-utils.js";
 import type { BfsStep, MatrixGraph } from "../shared/types.js";
 
 
@@ -9,7 +9,7 @@ function createArrowMarker(){
   if (!svg) return;
   const def = document.createElementNS(SVG.NAMESPACE,"defs");
   const marker = document.createElementNS(SVG.NAMESPACE,"marker");
-  marker.setAttribute("id", "arrow");
+  marker.setAttribute("id", "svg_arrow_marker");
   marker.setAttribute("viewBox", "0 0 10 10");
   marker.setAttribute("refX", "8");
   marker.setAttribute("refY", "5");
@@ -44,7 +44,7 @@ function renderQueue(){
   lineDown.setAttribute("stroke","black")
   lineDown.setAttribute("stroke-width","4");
   //queueGroup属性初始化
-  queueGroup.setAttribute("id","queueGroup")
+  queueGroup.setAttribute("id","queue_g")
   queueGroup.appendChild(lineUp);
   queueGroup.appendChild(lineDown);
   svg?.appendChild(queueGroup);
@@ -58,7 +58,7 @@ function renderInfoText(){
   introduce.setAttribute("font-size","30");
   introduce.setAttribute("font-family","Arial");
   introduce.setAttribute("text-anchor","middle");
-  introduce.setAttribute("id","introduce");
+  introduce.setAttribute("id","info_text");
   introduce.textContent = ``;
   svg?.appendChild(introduce);
 }
@@ -85,8 +85,8 @@ function renderGraph(graph:MatrixGraph){
         line.setAttribute("y2",`${y3}`);
         line.setAttribute("stroke","black");
         line.setAttribute("stroke-width","4"); 
-        line.setAttribute("marker-end","url(#arrow)")
-        line.setAttribute("id",`${i}-${j}`);
+        line.setAttribute("marker-end","url(#svg_arrow_marker)")
+        line.setAttribute("id",`edge_line_${i}_${j}`);
         svg.appendChild(line);
       }
     }
@@ -97,7 +97,7 @@ function renderGraph(graph:MatrixGraph){
     node.setAttribute("cx",`${graph.nodes[i]?.x}`);
     node.setAttribute("cy",`${graph.nodes[i]?.y}`);
     node.setAttribute("r",`${GRAPH.NODE_RADIUS}`);
-    node.setAttribute("id",`${i}`);
+    node.setAttribute("id",`node_circle_${i}`);
     node.classList.add("node");
     //文本
     const label = document.createElementNS(SVG.NAMESPACE,"text");
@@ -116,10 +116,10 @@ function renderGraph(graph:MatrixGraph){
 function executeBfsStep(stepQueue:BfsStep[],stepIndex:number):number{
   
   const svg = document.querySelector("svg");
-  const node = svg?.getElementById(`${stepQueue[stepIndex]?.nodeId}`);
-  const nodes = svg?.getElementById("queueGroup")?.querySelectorAll("rect"); 
-  const texts = svg?.getElementById("queueGroup")?.querySelectorAll("text");
-  const introduce = svg?.getElementById("introduce");
+  const node = svg?.getElementById(`node_circle_${stepQueue[stepIndex]?.nodeId}`);
+  const nodes = svg?.getElementById("queue_g")?.querySelectorAll("rect"); 
+  const texts = svg?.getElementById("queue_g")?.querySelectorAll("text");
+  const introduce = svg?.getElementById("info_text");
   if(stepIndex >= stepQueue.length) {
     introduce!.textContent = "算法结束";
     return stepQueue.length;
@@ -137,7 +137,7 @@ function executeBfsStep(stepQueue:BfsStep[],stepIndex:number):number{
       rect.setAttribute("stroke","black");
       rect.setAttribute("fill","none");
       rect.setAttribute("stroke-width","4");
-      rect.setAttribute("id",`${stepQueue[stepIndex]?.nodeId}_rect`);
+      rect.setAttribute("id",`queue_cell_rect_${stepQueue[stepIndex]?.nodeId}`);
       
       const text = document.createElementNS(SVG.NAMESPACE,"text");
       text.setAttribute("x",`${x+GRAPH.QUEUE_CELL_WIDTH/2}`);
@@ -145,11 +145,11 @@ function executeBfsStep(stepQueue:BfsStep[],stepIndex:number):number{
       text.setAttribute("font-size","20");
       text.setAttribute("font-family","Arial");
       text.setAttribute("text-anchor","middle");
-      text.setAttribute("id",`${stepQueue[stepIndex]?.nodeId}_id`)
+      text.setAttribute("id",`queue_cell_text_${stepQueue[stepIndex]?.nodeId}`)
       text.textContent = `${stepQueue[stepIndex]?.nodeId}`;
 
-      document.getElementById("queueGroup")!.appendChild(rect);
-      document.getElementById("queueGroup")!.appendChild(text);
+      document.getElementById("queue_g")!.appendChild(rect);
+      document.getElementById("queue_g")!.appendChild(text);
       break;
     case "dequeue":
       introduce!.textContent = `节点${stepQueue[stepIndex]?.nodeId}出队`;
@@ -184,15 +184,15 @@ function undoBfsStep(stepQueue:BfsStep[],stepIndex:number):number{
   if(stepIndex <= 0) return 0 ;
   stepIndex -= 1;
   const svg = document.querySelector("svg");
-  const node = svg?.getElementById(`${stepQueue[stepIndex]?.nodeId}`);
-  const nodes = svg?.getElementById("queueGroup")?.querySelectorAll("rect"); 
-  const texts = svg?.getElementById("queueGroup")?.querySelectorAll("text");
-  const introduce = svg?.getElementById("introduce");
+  const node = svg?.getElementById(`node_circle_${stepQueue[stepIndex]?.nodeId}`);
+  const nodes = svg?.getElementById("queue_g")?.querySelectorAll("rect"); 
+  const texts = svg?.getElementById("queue_g")?.querySelectorAll("text");
+  const introduce = svg?.getElementById("info_text");
   switch (stepQueue[stepIndex]?.action){
     case "enqueue":
       //队列回退
-      svg?.getElementById(`${stepQueue[stepIndex]?.nodeId}_rect`)?.remove();
-      svg?.getElementById(`${stepQueue[stepIndex]?.nodeId}_id`)?.remove();
+      svg?.getElementById(`queue_cell_rect_${stepQueue[stepIndex]?.nodeId}`)?.remove();
+      svg?.getElementById(`queue_cell_text_${stepQueue[stepIndex]?.nodeId}`)?.remove();
       break;
     case "dequeue":
       //队列回退
@@ -206,7 +206,7 @@ function undoBfsStep(stepQueue:BfsStep[],stepIndex:number):number{
       rect.setAttribute("stroke","black");
       rect.setAttribute("fill","none");
       rect.setAttribute("stroke-width","4");
-      rect.setAttribute("id",`${stepQueue[stepIndex]?.nodeId}_rect`);
+      rect.setAttribute("id",`queue_cell_rect_${stepQueue[stepIndex]?.nodeId}`);
       
       const text = document.createElementNS(SVG.NAMESPACE,"text");
       text.setAttribute("x",`${GRAPH.QUEUE_X+GRAPH.QUEUE_CELL_WIDTH/2}`);
@@ -214,11 +214,11 @@ function undoBfsStep(stepQueue:BfsStep[],stepIndex:number):number{
       text.setAttribute("font-size","20");
       text.setAttribute("font-family","Arial");
       text.setAttribute("text-anchor","middle");
-      text.setAttribute("id",`${stepQueue[stepIndex]?.nodeId}_id`)
+      text.setAttribute("id",`queue_cell_text_${stepQueue[stepIndex]?.nodeId}`)
       text.textContent = `${stepQueue[stepIndex]?.nodeId}`;
 
-      document.getElementById("queueGroup")!.appendChild(rect);
-      document.getElementById("queueGroup")!.appendChild(text);
+      document.getElementById("queue_g")!.appendChild(rect);
+      document.getElementById("queue_g")!.appendChild(text);
 
       //节点状态回退
       node?.classList.remove("visited");
@@ -257,7 +257,7 @@ function undoBfsStep(stepQueue:BfsStep[],stepIndex:number):number{
 }
 async function executeAllBfsSteps(stepQueue:BfsStep[],stepIndex:number,ms:number):Promise<number>{
   const svg = document.querySelector("svg");
-  const introduce = svg?.getElementById("introduce");
+  const introduce = svg?.getElementById("info_text");
   while(stepIndex<stepQueue.length){
     stepIndex = executeBfsStep(stepQueue,stepIndex);
     await wait(ms);

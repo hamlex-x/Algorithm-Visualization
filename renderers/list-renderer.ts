@@ -1,7 +1,7 @@
 import { SVG } from "../shared/config.js";
-import { initRect, createSVG, initText, initLine } from "../shared/fn.js";
+import { initRect, initText, initLine } from "../shared/svg-utils.js";
 
-function renderListTreeRect(){
+function renderCategoryTreeRect(){
     const svg = document.querySelector("svg");
     const datastructRect = document.createElementNS(SVG.NAMESPACE,"rect");
     const linearRect = document.createElementNS(SVG.NAMESPACE,"rect");
@@ -25,16 +25,16 @@ function renderListTreeRect(){
     initRect(heapRect,360,225,50,25,"black","none",4);
     initRect(graphRect,450,225,50,25,"black","none",4);
 
-    datastructRect.setAttribute("id","datastruct_rect");
-    linearRect.setAttribute("id","linear_rect");
-    nolinearRect.setAttribute("id","nolinear_rect");
+    datastructRect.setAttribute("id","cat_rect_datastruct");
+    linearRect.setAttribute("id","cat_rect_linear");
+    nolinearRect.setAttribute("id","cat_rect_nolinear");
 
-    linearlistRect.setAttribute("id","linearlist_rect");
-    stackReck.setAttribute("id","stack_rect");
-    queueRect.setAttribute("id","queue_rect");
-    treeRect.setAttribute("id","tree_rect");
-    heapRect.setAttribute("id","heap_rect");
-    graphRect.setAttribute("id"," graph_rect");
+    linearlistRect.setAttribute("id","cat_rect_linearlist");
+    stackReck.setAttribute("id","cat_rect_stack");
+    queueRect.setAttribute("id","cat_rect_queue");
+    treeRect.setAttribute("id","cat_rect_tree");
+    heapRect.setAttribute("id","cat_rect_heap");
+    graphRect.setAttribute("id","cat_rect_graph");
     
     svg?.appendChild(datastructRect);
     svg?.appendChild(linearRect);
@@ -46,7 +46,7 @@ function renderListTreeRect(){
     svg?.appendChild(heapRect);
     svg?.appendChild(graphRect);
 }
-function renderListTreeText(){
+function renderCategoryTreeText(){
     const svg = document.querySelector("svg");
 
     const datastructText = document.createElementNS(SVG.NAMESPACE, "text");
@@ -71,16 +71,16 @@ function renderListTreeText(){
     initText(heapText, "堆", 385, 237.5, 10);
     initText(graphText, "图", 475, 237.5, 10);
 
-    datastructText.setAttribute("id", "datastruct_text");
-    linearText.setAttribute("id", "linear_text");
-    nolinearText.setAttribute("id", "nolinear_text");
+    datastructText.setAttribute("id", "cat_text_datastruct");
+    linearText.setAttribute("id", "cat_text_linear");
+    nolinearText.setAttribute("id", "cat_text_nolinear");
 
-    linearlistText.setAttribute("id", "linearlist_text");
-    stackText.setAttribute("id", "stack_text");
-    queueText.setAttribute("id", "queue_text");
-    treeText.setAttribute("id", "tree_text");
-    heapText.setAttribute("id", "heap_text");
-    graphText.setAttribute("id", "graph_text");
+    linearlistText.setAttribute("id", "cat_text_linearlist");
+    stackText.setAttribute("id", "cat_text_stack");
+    queueText.setAttribute("id", "cat_text_queue");
+    treeText.setAttribute("id", "cat_text_tree");
+    heapText.setAttribute("id", "cat_text_heap");
+    graphText.setAttribute("id", "cat_text_graph");
 
     svg?.appendChild(datastructText);
     svg?.appendChild(linearText);
@@ -92,7 +92,7 @@ function renderListTreeText(){
     svg?.appendChild(heapText);
     svg?.appendChild(graphText);
 }
-function renderListTreeLine(){
+function renderCategoryTreeLine(){
     const svg = document.querySelector("svg");
 
     const ds2linear = document.createElementNS(SVG.NAMESPACE, "line");
@@ -117,16 +117,16 @@ function renderListTreeLine(){
     initLine(nolinear2heap, 400, 175, 385, 225, "black", 2);
     initLine(nolinear2graph, 400, 175, 475, 225, "black", 2);
 
-    ds2linear.setAttribute("id", "ds2linear_line");
-    ds2nolinear.setAttribute("id", "ds2nolinear_line");
+    ds2linear.setAttribute("id", "cat_line_ds_linear");
+    ds2nolinear.setAttribute("id", "cat_line_ds_nolinear");
 
-    linear2list.setAttribute("id", "linear2list_line");
-    linear2stack.setAttribute("id", "linear2stack_line");
-    linear2queue.setAttribute("id", "linear2queue_line");
+    linear2list.setAttribute("id", "cat_line_linear_list");
+    linear2stack.setAttribute("id", "cat_line_linear_stack");
+    linear2queue.setAttribute("id", "cat_line_linear_queue");
 
-    nolinear2tree.setAttribute("id", "nolinear2tree_line");
-    nolinear2heap.setAttribute("id", "nolinear2heap_line");
-    nolinear2graph.setAttribute("id", "nolinear2graph_line");
+    nolinear2tree.setAttribute("id", "cat_line_nolinear_tree");
+    nolinear2heap.setAttribute("id", "cat_line_nolinear_heap");
+    nolinear2graph.setAttribute("id", "cat_line_nolinear_graph");
 
     svg?.appendChild(ds2linear);
     svg?.appendChild(ds2nolinear);
@@ -137,7 +137,7 @@ function renderListTreeLine(){
     svg?.appendChild(nolinear2heap);
     svg?.appendChild(nolinear2graph);
 }   
-function renderAlgolistRect(){
+function renderAlgoListRect(){
     const svg = document.querySelector("svg");
 
     const bfsRect = document.createElementNS(SVG.NAMESPACE, "rect");
@@ -154,12 +154,12 @@ function renderAlgolistRect(){
     initRect(kruskalRect, 450, 380, 50, 20, "black", "none", 2);
     initRect(primRect, 450, 405, 50, 20, "black", "none", 2);
 
-    bfsRect.setAttribute("id", "bfs_rect");
-    dfsRect.setAttribute("id", "dfs_rect");
-    dijkstraRect.setAttribute("id", "dijkstra_rect");
-    astarRect.setAttribute("id", "astar_rect");
-    kruskalRect.setAttribute("id", "kruskal_rect");
-    primRect.setAttribute("id", "prim_rect");
+    bfsRect.setAttribute("id", "algo_rect_bfs");
+    dfsRect.setAttribute("id", "algo_rect_dfs");
+    dijkstraRect.setAttribute("id", "algo_rect_dijkstra");
+    astarRect.setAttribute("id", "algo_rect_astar");
+    kruskalRect.setAttribute("id", "algo_rect_kruskal");
+    primRect.setAttribute("id", "algo_rect_prim");
 
     bfsRect.addEventListener("click", () => {
         location.hash = "#/graph/bfs";
@@ -173,7 +173,7 @@ function renderAlgolistRect(){
     svg?.appendChild(kruskalRect);
     svg?.appendChild(primRect);
 }
-function renderAlgolistText(){
+function renderAlgoListText(){
     const svg = document.querySelector("svg");
 
     const bfsText = document.createElementNS(SVG.NAMESPACE, "text");
@@ -190,12 +190,12 @@ function renderAlgolistText(){
     initText(kruskalText, "Kruskal", 475, 390, 8);
     initText(primText, "Prim", 475, 415, 8);
 
-    bfsText.setAttribute("id", "bfs_text");
-    dfsText.setAttribute("id", "dfs_text");
-    dijkstraText.setAttribute("id", "dijkstra_text");
-    astarText.setAttribute("id", "astar_text");
-    kruskalText.setAttribute("id", "kruskal_text");
-    primText.setAttribute("id", "prim_text");
+    bfsText.setAttribute("id", "algo_text_bfs");
+    dfsText.setAttribute("id", "algo_text_dfs");
+    dijkstraText.setAttribute("id", "algo_text_dijkstra");
+    astarText.setAttribute("id", "algo_text_astar");
+    kruskalText.setAttribute("id", "algo_text_kruskal");
+    primText.setAttribute("id", "algo_text_prim");
 
     svg?.appendChild(bfsText);
     svg?.appendChild(dfsText);
@@ -204,11 +204,4 @@ function renderAlgolistText(){
     svg?.appendChild(kruskalText);
     svg?.appendChild(primText);
 }
-export function mount(container:HTMLElement){
-    createSVG(container);
-    renderListTreeRect();
-    renderListTreeText();
-    renderListTreeLine();
-    renderAlgolistRect();
-    renderAlgolistText();
-}
+export {renderCategoryTreeRect,renderCategoryTreeText,renderCategoryTreeLine,renderAlgoListRect,renderAlgoListText}

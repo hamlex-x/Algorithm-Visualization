@@ -2,7 +2,7 @@ import type { MatrixGraph,BfsStep } from "../shared/types.js"
 import { generateBfsSteps } from "../algos/graph-matrix-bfs-algo.js";
 import { buildGraph,createGraph } from "../builders/graph-matrix-builder.js";
 import { createArrowMarker, renderGraph, renderQueue, renderInfoText, executeAllBfsSteps, executeBfsStep, undoBfsStep, renderBfsButton } from "../renderers/graph-bfs-renderer.js";
-import { createSVG } from "../shared/fn.js";
+import { createSVG } from "../shared/svg-utils.js";
 
 //为button加载监听器
 export function bindBfsButtons(){

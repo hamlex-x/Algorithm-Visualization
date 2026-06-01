@@ -1,5 +1,5 @@
 const routes :Record<string,() => Promise<any>> = {
-    "list": ()=>import("./pages/list.js"),
+    "list": ()=>import("./pages/list-page.js"),
     "graph/bfs": () => import("./pages/graph-bfs-page.js"),
 };
 async function navigate(path:string){
