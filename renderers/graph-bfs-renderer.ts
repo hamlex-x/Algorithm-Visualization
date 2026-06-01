@@ -2,13 +2,7 @@ import { CANVAS, GRAPH, SVG } from "../shared/config.js";
 import { wait } from "../shared/fn.js";
 import type { BfsStep, MatrixGraph } from "../shared/types.js";
 
-//在document中生成一个svg，画布大小由svgWidth和决定
-function createSVG(){
-  const svg = document.createElementNS(SVG.NAMESPACE,"svg");
-  svg.setAttribute("width",`${CANVAS.WIDTH}`);
-  svg.setAttribute("height",`${CANVAS.HEIGHT}`);
-  document.body.appendChild(svg);
-}
+
 //在svg中创建一个marker，并在其中写入箭头id=arrow
 function createArrowMarker(){
   const svg = document.querySelector("svg");
@@ -273,4 +267,26 @@ async function executeAllBfsSteps(stepQueue:BfsStep[],stepIndex:number,ms:number
   }
   return stepQueue.length;
 }
-export{createSVG,createArrowMarker,renderQueue,renderInfoText,renderGraph,executeBfsStep,undoBfsStep,executeAllBfsSteps}
+function renderBfsButton(container:HTMLElement){
+  const bntNext = document.createElement("button");
+  const bntLast = document.createElement("button");
+  const bntAll = document.createElement("button");
+  bntNext.setAttribute("id","btn_next")
+  bntLast.setAttribute("id","btn_last")
+  bntAll.setAttribute("id","btn_all")
+  bntNext.textContent = "下一步";
+  bntLast.textContent = "上一步";
+  bntAll.textContent = "执行全部";
+
+  const wrapper = document.createElement("div");
+  wrapper.style.display = "flex";
+  wrapper.style.justifyContent = "center";  // 水平居中
+  wrapper.style.gap = "8px";               // 按钮之间的间距
+  wrapper.style.width = `${CANVAS.WIDTH}px`;
+  
+  wrapper.appendChild(bntNext);
+  wrapper.appendChild(bntLast);
+  wrapper.appendChild(bntAll);
+  container.appendChild(wrapper);
+}
+export{createArrowMarker,renderQueue,renderInfoText,renderGraph,executeBfsStep,undoBfsStep,executeAllBfsSteps,renderBfsButton}
