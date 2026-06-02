@@ -1,6 +1,6 @@
 import { SVG } from "../shared/config.js";
 import { initRect, initText, initLine } from "../shared/svg-utils.js";
-
+import { graph } from "../shared/state.js";
 function renderCategoryTreeRect(){
     const svg = document.querySelector("svg");
     const datastructRect = document.createElementNS(SVG.NAMESPACE,"rect");
@@ -18,12 +18,12 @@ function renderCategoryTreeRect(){
     initRect(linearRect,50,125,100,50,"black","none",4);
     initRect(nolinearRect,350,125,100,50,"black","none",4);
 
-    initRect(linearlistRect,0,225,50,25,"black","none",4);
-    initRect(stackReck,100,225,50,25,"black","none",4);
-    initRect(queueRect,200,225,50,25,"black","none",4);
-    initRect(treeRect,270,225,50,25,"black","none",4);
-    initRect(heapRect,360,225,50,25,"black","none",4);
-    initRect(graphRect,450,225,50,25,"black","none",4);
+    initRect(linearlistRect,0,225,50,25,"black","transparent",4);
+    initRect(stackReck,100,225,50,25,"black","transparent",4);
+    initRect(queueRect,200,225,50,25,"black","transparent",4);
+    initRect(treeRect,270,225,50,25,"black","transparent",4);
+    initRect(heapRect,360,225,50,25,"black","transparent",4);
+    initRect(graphRect,450,225,50,25,"black","transparent",4);
 
     datastructRect.setAttribute("id","cat_rect_datastruct");
     linearRect.setAttribute("id","cat_rect_linear");
@@ -35,7 +35,11 @@ function renderCategoryTreeRect(){
     treeRect.setAttribute("id","cat_rect_tree");
     heapRect.setAttribute("id","cat_rect_heap");
     graphRect.setAttribute("id","cat_rect_graph");
-    
+    //添加页面跳转
+    graphRect.addEventListener("click",() => {
+        location.hash = "#/graph/create";
+    });
+    graphRect.style.cursor = "pointer";
     svg?.appendChild(datastructRect);
     svg?.appendChild(linearRect);
     svg?.appendChild(nolinearRect);
@@ -148,11 +152,11 @@ function renderAlgoListRect(){
     const primRect = document.createElementNS(SVG.NAMESPACE, "rect");
 
     initRect(bfsRect, 450, 275, 50, 20, "black", "transparent", 2);
-    initRect(dfsRect, 450, 305, 50, 20, "black", "none", 2);
-    initRect(dijkstraRect, 450, 330, 50, 20, "black", "none", 2);
-    initRect(astarRect, 450, 355, 50, 20, "black", "none", 2);
-    initRect(kruskalRect, 450, 380, 50, 20, "black", "none", 2);
-    initRect(primRect, 450, 405, 50, 20, "black", "none", 2);
+    initRect(dfsRect, 450, 305, 50, 20, "black", "transparent", 2);
+    initRect(dijkstraRect, 450, 330, 50, 20, "black", "transparent", 2);
+    initRect(astarRect, 450, 355, 50, 20, "black", "transparent", 2);
+    initRect(kruskalRect, 450, 380, 50, 20, "black", "transparent", 2);
+    initRect(primRect, 450, 405, 50, 20, "black", "transparent", 2);
 
     bfsRect.setAttribute("id", "algo_rect_bfs");
     dfsRect.setAttribute("id", "algo_rect_dfs");
@@ -160,12 +164,17 @@ function renderAlgoListRect(){
     astarRect.setAttribute("id", "algo_rect_astar");
     kruskalRect.setAttribute("id", "algo_rect_kruskal");
     primRect.setAttribute("id", "algo_rect_prim");
-
+    //添加页面跳转
     bfsRect.addEventListener("click", () => {
+        if(graph.matrix.length === 0) {
+            alert("请先点击‘图’创建矩阵");
+            return;
+        }
         location.hash = "#/graph/bfs";
     });
     bfsRect.style.cursor = "pointer";
-    
+
+
     svg?.appendChild(bfsRect);
     svg?.appendChild(dfsRect);
     svg?.appendChild(dijkstraRect);

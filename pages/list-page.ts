@@ -1,9 +1,9 @@
 import { renderAlgoListRect, renderAlgoListText, renderCategoryTreeLine, renderCategoryTreeRect, renderCategoryTreeText } from "../renderers/list-renderer.js";
-import { createSVG } from "../shared/svg-utils.js";
+import { initSVG } from "../shared/svg-utils.js";
 
 
 export function mount(container:HTMLElement){
-    createSVG(container);
+    initSVG(container);
     renderCategoryTreeRect();
     renderCategoryTreeText();
     renderCategoryTreeLine();

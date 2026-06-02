@@ -5,7 +5,7 @@ function wait(ms:number):Promise<void>{
   return new Promise((resolve)=>{setTimeout(resolve,ms)});
 }
 //创建一个svg画布
-function createSVG(container:HTMLElement){
+function initSVG(container:HTMLElement){
   const svg = document.createElementNS(SVG.NAMESPACE,"svg");
   svg.setAttribute("width",`${CANVAS.WIDTH}`);
   svg.setAttribute("height",`${CANVAS.HEIGHT}`);
@@ -39,4 +39,4 @@ function initLine(line:SVGLineElement,x1:number,y1:number,x2:number,y2:number,co
     line.setAttribute("stroke",color);
     line.setAttribute("stroke-width",`${stroke_width}`);
 }
-export{wait,createSVG,initRect,initText,initLine}
+export{wait,initSVG,initRect,initText,initLine}

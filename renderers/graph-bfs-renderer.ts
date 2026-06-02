@@ -4,7 +4,7 @@ import type { BfsStep, MatrixGraph } from "../shared/types.js";
 
 
 //在svg中创建一个marker，并在其中写入箭头id=arrow
-function createArrowMarker(){
+function renderArrowMarker(){
   const svg = document.querySelector("svg");
   if (!svg) return;
   const def = document.createElementNS(SVG.NAMESPACE,"defs");
@@ -69,14 +69,14 @@ function renderGraph(graph:MatrixGraph){
   //画线
   for(let i=0;i<graph.cnt;i++){
     for(let j=0;j<graph.cnt;j++){
-      if(graph.matrix[i]![j]===1){
+      if(graph.matrix[i]![j]===1 && i!==j){
         const line = document.createElementNS(SVG.NAMESPACE,"line");
         let x1 = graph.nodes[i]!.x;
         let y1 = graph.nodes[i]!.y;
         let x2 = graph.nodes[j]!.x;
         let y2 = graph.nodes[j]!.y;
         let hypotenuse = Math.sqrt(Math.pow(x1-x2,2)+Math.pow(y1-y2,2));
-        
+
         let x3 = x2 + GRAPH.NODE_RADIUS*(x1-x2)/hypotenuse;
         let y3 = y2 + GRAPH.NODE_RADIUS*(y1-y2)/hypotenuse;
         line.setAttribute("x1",`${x1}`);
@@ -255,6 +255,7 @@ function undoBfsStep(stepQueue:BfsStep[],stepIndex:number):number{
   }
   return stepIndex;
 }
+//执行stepQueue中的所有步骤
 async function executeAllBfsSteps(stepQueue:BfsStep[],stepIndex:number,ms:number):Promise<number>{
   const svg = document.querySelector("svg");
   const introduce = svg?.getElementById("info_text");
@@ -268,15 +269,15 @@ async function executeAllBfsSteps(stepQueue:BfsStep[],stepIndex:number,ms:number
   return stepQueue.length;
 }
 function renderBfsButton(container:HTMLElement){
-  const bntNext = document.createElement("button");
-  const bntLast = document.createElement("button");
-  const bntAll = document.createElement("button");
-  bntNext.setAttribute("id","btn_next")
-  bntLast.setAttribute("id","btn_last")
-  bntAll.setAttribute("id","btn_all")
-  bntNext.textContent = "下一步";
-  bntLast.textContent = "上一步";
-  bntAll.textContent = "执行全部";
+  const btnNext = document.createElement("button");
+  const btnLast = document.createElement("button");
+  const btnAll = document.createElement("button");
+  btnNext.setAttribute("id","btn_next")
+  btnLast.setAttribute("id","btn_last")
+  btnAll.setAttribute("id","btn_all")
+  btnNext.textContent = "下一步";
+  btnLast.textContent = "上一步";
+  btnAll.textContent = "执行全部";
 
   const wrapper = document.createElement("div");
   wrapper.style.display = "flex";
@@ -284,9 +285,15 @@ function renderBfsButton(container:HTMLElement){
   wrapper.style.gap = "8px";               // 按钮之间的间距
   wrapper.style.width = `${CANVAS.WIDTH}px`;
   
-  wrapper.appendChild(bntNext);
-  wrapper.appendChild(bntLast);
-  wrapper.appendChild(bntAll);
+  wrapper.appendChild(btnNext);
+  wrapper.appendChild(btnLast);
+  wrapper.appendChild(btnAll);
   container.appendChild(wrapper);
 }
-export{createArrowMarker,renderQueue,renderInfoText,renderGraph,executeBfsStep,undoBfsStep,executeAllBfsSteps,renderBfsButton}
+//创建bfs标题
+function renderBfsTitle(container:HTMLElement){
+  const title = document.createElement("h2");
+  title.textContent = "广度优先搜索";
+  container.appendChild(title);
+}
+export{renderArrowMarker,renderQueue,renderInfoText,renderGraph,executeBfsStep,undoBfsStep,executeAllBfsSteps,renderBfsButton,renderBfsTitle}

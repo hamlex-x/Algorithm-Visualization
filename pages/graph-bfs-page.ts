@@ -1,46 +1,32 @@
 import type { MatrixGraph,BfsStep } from "../shared/types.js"
 import { generateBfsSteps } from "../algos/graph-matrix-bfs-algo.js";
 import { buildGraph,createGraph } from "../builders/graph-matrix-builder.js";
-import { createArrowMarker, renderGraph, renderQueue, renderInfoText, executeAllBfsSteps, executeBfsStep, undoBfsStep, renderBfsButton } from "../renderers/graph-bfs-renderer.js";
-import { createSVG } from "../shared/svg-utils.js";
-
+import { renderArrowMarker, renderGraph, renderQueue, renderInfoText, executeAllBfsSteps, executeBfsStep, undoBfsStep, renderBfsButton, renderBfsTitle } from "../renderers/graph-bfs-renderer.js";
+import { initSVG } from "../shared/svg-utils.js";
+import { graph } from "../shared/state.js";
 //为button加载监听器
 export function bindBfsButtons(){
-  const bntNext = document.getElementById("btn_next");
-  const bntAll = document.getElementById("btn_all");
-  const bntLast = document.getElementById("btn_last");
-  bntNext?.addEventListener("click",()=>{stepIndex = executeBfsStep(stepQueue, stepIndex)})
-  bntAll?.addEventListener("click",async ()=>{stepIndex = await executeAllBfsSteps(stepQueue, stepIndex,ms)})
-  bntLast?.addEventListener("click",()=>{stepIndex = undoBfsStep(stepQueue, stepIndex)})
+  const btnNext = document.getElementById("btn_next");
+  const btnAll = document.getElementById("btn_all");
+  const btnLast = document.getElementById("btn_last");
+  btnNext?.addEventListener("click",()=>{stepIndex = executeBfsStep(stepQueue, stepIndex)})
+  btnAll?.addEventListener("click",async ()=>{stepIndex = await executeAllBfsSteps(stepQueue, stepIndex,ms)})
+  btnLast?.addEventListener("click",()=>{stepIndex = undoBfsStep(stepQueue, stepIndex)})
 }
   let stepIndex = 0;
   let ms =1000;
   const stepQueue: BfsStep[] = [];
+
 export function mount(container:HTMLElement){
+  renderBfsTitle(container);
   stepIndex = 0;
   stepQueue.length = 0;
-  // const matrix1:number[][] = [
-  //   [0,1,1,0,0],
-  //   [1,0,1,1,0],
-  //   [1,1,0,0,1],
-  //   [0,1,0,0,1],
-  //   [0,0,1,1,0]
-  // ];
-  // let matrixGraph : MatrixGraph = createGraph(5);
-  const matrix1:number[][] = [
-  [0,1,1,1,0,0,0,0],
-  [1,0,1,0,1,0,0,1],
-  [1,1,0,0,1,1,1,1],
-  [1,0,0,0,1,0,0,1],
-  [0,1,1,1,0,0,1,1],
-  [0,0,1,0,0,0,0,0],
-  [0,0,1,0,1,0,0,0],
-  [0,1,1,1,1,0,0,0]
-  ];
-  let matrixGraph : MatrixGraph = createGraph(8);
+  const matrix1:number[][] = graph.matrix;
+  const matrixGraph : MatrixGraph = createGraph(matrix1.length);
+  console.log(matrix1);
   buildGraph(matrix1,matrixGraph);
-  createSVG(container);
-  createArrowMarker();
+  initSVG(container);
+  renderArrowMarker();
   renderGraph(matrixGraph);
   renderQueue();
   renderInfoText();
