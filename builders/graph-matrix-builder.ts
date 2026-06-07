@@ -1,37 +1,30 @@
 import { GRAPH } from "../shared/config.js";
 import type { GraphNode, MatrixGraph } from "../shared/types.js";
 
-//创建一个MatrixGraph，使nodes为默认值，cnt为nodes数量
-function createGraph(cnt:number):MatrixGraph{
+//创建nodes为默认值
+function createNodes(cnt:number):GraphNode[]{
   const nodes:GraphNode[] = [];
   for(let i=0;i<cnt;i++)
     nodes.push({x:0,y:0,label:`${i}`,status:"unvisited"})
-  const matrix:number[][] = [];
-  for(let i=0;i<cnt;i++){
-    const row:number[] = [];
-    for(let j=0;j<cnt;j++){
-      row.push(0)
-    }
-    matrix.push(row)
-  }
-  return {
-    nodes,
-    matrix,
-    cnt,
-  }
+  return nodes;
 }
-//将MatrixGraph的matrix设置为需要值
-function buildGraph(matrix:number[][],graph:MatrixGraph){
-  calcCircleLayout(graph,GRAPH.LAYOUT_RADIUS,GRAPH.LAYOUT_CENTER_X,GRAPH.LAYOUT_CENTER_Y);
-  graph.matrix = matrix;
-}
+
 //将MatrixGraph的nodes的坐标按照圆形布局赋值
-function calcCircleLayout(graph : MatrixGraph,radius:number,cx:number,cy:number){
-  const n = graph.cnt;
+function calcCircleLayout(nodes:GraphNode[],radius:number,cx:number,cy:number){
+  const n = nodes.length;
   for(let i=0;i<n;i++){
     const angle = 2*Math.PI*i/n;
-    graph.nodes[i]!.x = cx + radius*Math.cos(angle);
-    graph.nodes[i]!.y = cy + radius*Math.sin(angle);
+    nodes[i]!.x = cx + radius*Math.cos(angle);
+    nodes[i]!.y = cy + radius*Math.sin(angle);
   }
 }
-export{buildGraph,createGraph}
+//完成对整个graph.matrixGraph的初始化
+function buildGraphMatrix(matrix:number[][]):MatrixGraph{
+  const graphMatrix:MatrixGraph = {matrix:matrix,cnt:0,nodes:[]};
+  graphMatrix.matrix = matrix;
+  graphMatrix.cnt = matrix.length;
+  graphMatrix.nodes = createNodes(graphMatrix.cnt);
+  calcCircleLayout(graphMatrix.nodes,GRAPH.LAYOUT_RADIUS,GRAPH.LAYOUT_CENTER_X,GRAPH.LAYOUT_CENTER_Y);
+  return graphMatrix;
+}
+export{buildGraphMatrix,createNodes}

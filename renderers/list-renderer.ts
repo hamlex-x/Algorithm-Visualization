@@ -1,8 +1,7 @@
 import { SVG } from "../shared/config.js";
-import { initRect, initText, initLine } from "../shared/svg-utils.js";
-import { graph } from "../shared/state.js";
-function renderCategoryTreeRect(){
-    const svg = document.querySelector("svg");
+import { initRect, initText, initLine, initSVG } from "../shared/svg-utils.js";
+
+function renderCategoryTreeRect(svg:SVGSVGElement){
     const datastructRect = document.createElementNS(SVG.NAMESPACE,"rect");
     const linearRect = document.createElementNS(SVG.NAMESPACE,"rect");
     const nolinearRect = document.createElementNS(SVG.NAMESPACE,"rect");
@@ -35,11 +34,7 @@ function renderCategoryTreeRect(){
     treeRect.setAttribute("id","cat_rect_tree");
     heapRect.setAttribute("id","cat_rect_heap");
     graphRect.setAttribute("id","cat_rect_graph");
-    //添加页面跳转
-    graphRect.addEventListener("click",() => {
-        location.hash = "#/graph/create";
-    });
-    graphRect.style.cursor = "pointer";
+
     svg?.appendChild(datastructRect);
     svg?.appendChild(linearRect);
     svg?.appendChild(nolinearRect);
@@ -50,9 +45,7 @@ function renderCategoryTreeRect(){
     svg?.appendChild(heapRect);
     svg?.appendChild(graphRect);
 }
-function renderCategoryTreeText(){
-    const svg = document.querySelector("svg");
-
+function renderCategoryTreeText(svg:SVGSVGElement){
     const datastructText = document.createElementNS(SVG.NAMESPACE, "text");
     const linearText = document.createElementNS(SVG.NAMESPACE, "text");
     const nolinearText = document.createElementNS(SVG.NAMESPACE, "text");
@@ -96,9 +89,7 @@ function renderCategoryTreeText(){
     svg?.appendChild(heapText);
     svg?.appendChild(graphText);
 }
-function renderCategoryTreeLine(){
-    const svg = document.querySelector("svg");
-
+function renderCategoryTreeLine(svg:SVGSVGElement){
     const ds2linear = document.createElementNS(SVG.NAMESPACE, "line");
     const ds2nolinear = document.createElementNS(SVG.NAMESPACE, "line");
 
@@ -141,9 +132,7 @@ function renderCategoryTreeLine(){
     svg?.appendChild(nolinear2heap);
     svg?.appendChild(nolinear2graph);
 }   
-function renderAlgoListRect(){
-    const svg = document.querySelector("svg");
-
+function renderAlgoListRect(svg:SVGSVGElement){
     const bfsRect = document.createElementNS(SVG.NAMESPACE, "rect");
     const dfsRect = document.createElementNS(SVG.NAMESPACE, "rect");
     const dijkstraRect = document.createElementNS(SVG.NAMESPACE, "rect");
@@ -164,17 +153,7 @@ function renderAlgoListRect(){
     astarRect.setAttribute("id", "algo_rect_astar");
     kruskalRect.setAttribute("id", "algo_rect_kruskal");
     primRect.setAttribute("id", "algo_rect_prim");
-    //添加页面跳转
-    bfsRect.addEventListener("click", () => {
-        if(graph.matrix.length === 0) {
-            alert("请先点击‘图’创建矩阵");
-            return;
-        }
-        location.hash = "#/graph/bfs";
-    });
-    bfsRect.style.cursor = "pointer";
-
-
+   
     svg?.appendChild(bfsRect);
     svg?.appendChild(dfsRect);
     svg?.appendChild(dijkstraRect);
@@ -182,9 +161,7 @@ function renderAlgoListRect(){
     svg?.appendChild(kruskalRect);
     svg?.appendChild(primRect);
 }
-function renderAlgoListText(){
-    const svg = document.querySelector("svg");
-
+function renderAlgoListText(svg:SVGSVGElement){
     const bfsText = document.createElementNS(SVG.NAMESPACE, "text");
     const dfsText = document.createElementNS(SVG.NAMESPACE, "text");
     const dijkstraText = document.createElementNS(SVG.NAMESPACE, "text");
@@ -213,4 +190,13 @@ function renderAlgoListText(){
     svg?.appendChild(kruskalText);
     svg?.appendChild(primText);
 }
-export {renderCategoryTreeRect,renderCategoryTreeText,renderCategoryTreeLine,renderAlgoListRect,renderAlgoListText}
+function renderListUI(container:HTMLElement):SVGSVGElement{
+    const svg = initSVG(container);
+    renderCategoryTreeRect(svg);
+    renderCategoryTreeText(svg);
+    renderCategoryTreeLine(svg);
+    renderAlgoListRect(svg);
+    renderAlgoListText(svg);
+    return svg;
+}
+export {renderListUI}

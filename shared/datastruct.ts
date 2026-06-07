@@ -12,3 +12,10 @@ export class Queue<T>{
     return false;
   }
 }
+export class LinkNode<T>{
+  data:T| null = null;
+  next:LinkNode<T>| null = null;
+  constructor(data:T|null){
+    this.data = data;
+  }
+}

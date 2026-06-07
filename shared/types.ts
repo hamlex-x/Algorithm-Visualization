@@ -14,5 +14,13 @@ interface BfsStep {
   action:"enqueue"|"dequeue"|"visit"|"check",
   nodeId:number
 }
-
-export type {GraphNode,MatrixGraph,BfsStep}
+interface DfsStep {
+  action:"enqueue"|"dequeue"|"visit"|"check",
+  nodeId:number
+}
+interface Runtime {
+  stepQueue: BfsStep[]|DfsStep[];
+  stepIndex: number;
+  ms: number;
+}
+export type {GraphNode,MatrixGraph,BfsStep,Runtime}

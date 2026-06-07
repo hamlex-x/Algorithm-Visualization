@@ -5,11 +5,12 @@ function wait(ms:number):Promise<void>{
   return new Promise((resolve)=>{setTimeout(resolve,ms)});
 }
 //创建一个svg画布
-function initSVG(container:HTMLElement){
+function initSVG(container:HTMLElement):SVGSVGElement{
   const svg = document.createElementNS(SVG.NAMESPACE,"svg");
   svg.setAttribute("width",`${CANVAS.WIDTH}`);
   svg.setAttribute("height",`${CANVAS.HEIGHT}`);
   container.appendChild(svg);
+  return svg;
 }
 //初始化一个rect
 function initRect(rect:SVGRectElement,x:number,y:number,weight:number,height:number,color:string,fill:string,stroke_width:number){

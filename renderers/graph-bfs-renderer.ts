@@ -1,11 +1,10 @@
 import { CANVAS, GRAPH, SVG } from "../shared/config.js";
-import { wait } from "../shared/svg-utils.js";
+import { initSVG, wait } from "../shared/svg-utils.js";
 import type { BfsStep, MatrixGraph } from "../shared/types.js";
 
 
 //在svg中创建一个marker，并在其中写入箭头id=arrow
-function renderArrowMarker(){
-  const svg = document.querySelector("svg");
+function renderArrowMarker(svg:SVGSVGElement){
   if (!svg) return;
   const def = document.createElementNS(SVG.NAMESPACE,"defs");
   const marker = document.createElementNS(SVG.NAMESPACE,"marker");
@@ -24,8 +23,7 @@ function renderArrowMarker(){
   def.appendChild(marker);
 }
 //在svg中创建一个组id=queueGroup其中有队列的lineUp与lineDown
-function renderQueue(){
-  const svg = document.querySelector("svg");
+function renderQueue(svg:SVGSVGElement){
   const queueGroup = document.createElementNS(SVG.NAMESPACE,"g");
   const lineUp = document.createElementNS(SVG.NAMESPACE,"line");
   const lineDown = document.createElementNS(SVG.NAMESPACE,"line");
@@ -50,8 +48,7 @@ function renderQueue(){
   svg?.appendChild(queueGroup);
 }
 //在svg中创建一个说明文本
-function renderInfoText(){
-  const svg = document.querySelector("svg");
+function renderInfoText(svg:SVGSVGElement){
   const introduce = document.createElementNS(SVG.NAMESPACE,"text");
   introduce.setAttribute("x",`${GRAPH.INTRODUCE_X}`);
   introduce.setAttribute("y",`${GRAPH.INTRODUCE_Y}`);
@@ -63,8 +60,7 @@ function renderInfoText(){
   svg?.appendChild(introduce);
 }
 //将MatrixGraph渲染到svg中节点id为对应节点下标，线段号为发出节点号-指向节点号
-function renderGraph(graph:MatrixGraph){
-  const svg = document.querySelector("svg");
+function renderGraph(svg:SVGSVGElement,graph:MatrixGraph){
   if (!svg) return;
   //画线
   for(let i=0;i<graph.cnt;i++){
@@ -113,9 +109,8 @@ function renderGraph(graph:MatrixGraph){
   }
 }
 //执行stepQueue的下一步
-function executeBfsStep(stepQueue:BfsStep[],stepIndex:number):number{
+function executeBfsStep(svg:SVGSVGElement,stepQueue:BfsStep[],stepIndex:number):number{
   
-  const svg = document.querySelector("svg");
   const node = svg?.getElementById(`node_circle_${stepQueue[stepIndex]?.nodeId}`);
   const nodes = svg?.getElementById("queue_g")?.querySelectorAll("rect"); 
   const texts = svg?.getElementById("queue_g")?.querySelectorAll("text");
@@ -148,8 +143,8 @@ function executeBfsStep(stepQueue:BfsStep[],stepIndex:number):number{
       text.setAttribute("id",`queue_cell_text_${stepQueue[stepIndex]?.nodeId}`)
       text.textContent = `${stepQueue[stepIndex]?.nodeId}`;
 
-      document.getElementById("queue_g")!.appendChild(rect);
-      document.getElementById("queue_g")!.appendChild(text);
+      svg.getElementById("queue_g")!.appendChild(rect);
+      svg.getElementById("queue_g")!.appendChild(text);
       break;
     case "dequeue":
       introduce!.textContent = `节点${stepQueue[stepIndex]?.nodeId}出队`;
@@ -180,10 +175,9 @@ function executeBfsStep(stepQueue:BfsStep[],stepIndex:number):number{
   return stepIndex+1;
 }
 //撤回stepQueue中的上一步
-function undoBfsStep(stepQueue:BfsStep[],stepIndex:number):number{
+function undoBfsStep(svg:SVGSVGElement,stepQueue:BfsStep[],stepIndex:number):number{
   if(stepIndex <= 0) return 0 ;
   stepIndex -= 1;
-  const svg = document.querySelector("svg");
   const node = svg?.getElementById(`node_circle_${stepQueue[stepIndex]?.nodeId}`);
   const nodes = svg?.getElementById("queue_g")?.querySelectorAll("rect"); 
   const texts = svg?.getElementById("queue_g")?.querySelectorAll("text");
@@ -217,8 +211,8 @@ function undoBfsStep(stepQueue:BfsStep[],stepIndex:number):number{
       text.setAttribute("id",`queue_cell_text_${stepQueue[stepIndex]?.nodeId}`)
       text.textContent = `${stepQueue[stepIndex]?.nodeId}`;
 
-      document.getElementById("queue_g")!.appendChild(rect);
-      document.getElementById("queue_g")!.appendChild(text);
+      svg.getElementById("queue_g")!.appendChild(rect);
+      svg.getElementById("queue_g")!.appendChild(text);
 
       //节点状态回退
       node?.classList.remove("visited");
@@ -256,11 +250,10 @@ function undoBfsStep(stepQueue:BfsStep[],stepIndex:number):number{
   return stepIndex;
 }
 //执行stepQueue中的所有步骤
-async function executeAllBfsSteps(stepQueue:BfsStep[],stepIndex:number,ms:number):Promise<number>{
-  const svg = document.querySelector("svg");
+async function executeAllBfsSteps(svg:SVGSVGElement,stepQueue:BfsStep[],stepIndex:number,ms:number):Promise<number>{
   const introduce = svg?.getElementById("info_text");
   while(stepIndex<stepQueue.length){
-    stepIndex = executeBfsStep(stepQueue,stepIndex);
+    stepIndex = executeBfsStep(svg,stepQueue,stepIndex);
     await wait(ms);
   }
   if(stepIndex >= stepQueue.length) {
@@ -296,4 +289,14 @@ function renderBfsTitle(container:HTMLElement){
   title.textContent = "广度优先搜索";
   container.appendChild(title);
 }
-export{renderArrowMarker,renderQueue,renderInfoText,renderGraph,executeBfsStep,undoBfsStep,executeAllBfsSteps,renderBfsButton,renderBfsTitle}
+function renderBfsUI(container:HTMLElement,graph:MatrixGraph):SVGSVGElement{
+  renderBfsTitle(container);
+  const svg = initSVG(container);      
+  renderArrowMarker(svg);              
+  renderGraph(svg, graph);             
+  renderQueue(svg);                    
+  renderInfoText(svg);                 
+  renderBfsButton(container);
+  return svg;                          
+}
+export{renderBfsUI,executeBfsStep,undoBfsStep,executeAllBfsSteps}

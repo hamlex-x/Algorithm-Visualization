@@ -9,14 +9,14 @@ function renderGraphMatrixInput(container:HTMLElement){
     container.appendChild(input);
 }
 //渲染产生矩阵的表格
-function renderGraphMatrixTable(container:HTMLElement){
+function renderGraphMatrixTable(container:HTMLElement):HTMLTableElement{
     const graphMatrixTable = document.createElement("table");
     graphMatrixTable.setAttribute("id","graph_table_matrix");
     container.appendChild(graphMatrixTable);
+    return graphMatrixTable;
 }
 //重新渲染表格大小
-function resizeGraphMatrixTable(cnt:number){
-    const graphMatrixTable = document.getElementById("graph_table_matrix");
+function resizeGraphMatrixTable(graphMatrixTable:HTMLTableElement,cnt:number):HTMLTableElement{
     graphMatrixTable!.innerHTML = "";
     const header = document.createElement("tr")
     const thead  = document.createElement("thead");
@@ -36,29 +36,27 @@ function resizeGraphMatrixTable(cnt:number){
             const td = document.createElement("td");
             const input = document.createElement("input");
             input.setAttribute("type","number");
+            input.setAttribute("id",`graph_input_${i}_${j}`);
             input.min = "0";
             input.max = "1";
             input.value = "0";
-            input.addEventListener("change",()=>{
-                const value = Number(input.value);
-                if(i === j) {
-                    input.value = "0";
-                    return;
-                }
-                if(value >1) input.value = "1";
-                if(value <0) input.value = "0";
-            })
             td.appendChild(input);
             tr.appendChild(td);
         }
         tbody?.appendChild(tr);
     }
     graphMatrixTable?.appendChild(tbody);
-    
+    return graphMatrixTable;
 }
 function renderGraphMatrixTitle(container:HTMLElement){
     const title = document.createElement("h2");
     title.textContent = "创建邻接矩阵";
     container.appendChild(title);
 }
-export {renderGraphMatrixInput,renderGraphMatrixTable,resizeGraphMatrixTable,renderGraphMatrixTitle}
+function renderCreateUI(container:HTMLElement):HTMLTableElement{
+    renderGraphMatrixTitle(container);
+    renderGraphMatrixInput(container);
+    const graphMatrixTable = renderGraphMatrixTable(container);
+    return graphMatrixTable;
+}
+export {renderCreateUI,resizeGraphMatrixTable}
