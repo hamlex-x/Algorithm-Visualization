@@ -22,5 +22,6 @@ interface Runtime {
   stepQueue: BfsStep[]|DfsStep[];
   stepIndex: number;
   ms: number;
+  isAnimating: boolean;
 }
 export type {GraphNode,MatrixGraph,BfsStep,Runtime}

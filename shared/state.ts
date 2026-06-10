@@ -3,6 +3,7 @@
 //     representation: "matrix" as "matrix" | "list",
 // }
 
+
 import type { GraphNode, MatrixGraph } from "../shared/types.js";
 const graph : {
     matrixGraph : MatrixGraph,

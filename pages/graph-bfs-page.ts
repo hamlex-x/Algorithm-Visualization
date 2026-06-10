@@ -7,17 +7,24 @@ export function bindBfsButtons(svg:SVGSVGElement,bfsRuntime:Runtime){
   const btnNext = document.getElementById("btn_next");
   const btnAll = document.getElementById("btn_all");
   const btnLast = document.getElementById("btn_last");
-  btnNext?.addEventListener("click",()=>{bfsRuntime.stepIndex = executeBfsStep(svg,bfsRuntime.stepQueue, bfsRuntime.stepIndex)})
+  btnNext?.addEventListener("click",async ()=>{
+    if(bfsRuntime.isAnimating) return;
+
+    bfsRuntime.isAnimating = true;
+    try{
+      bfsRuntime.stepIndex = await  executeBfsStep(svg,bfsRuntime.stepQueue, bfsRuntime.stepIndex);
+    }finally{
+      bfsRuntime.isAnimating = false;
+    }
+    
+  })
   btnAll?.addEventListener("click",async ()=>{bfsRuntime.stepIndex = await executeAllBfsSteps(svg,bfsRuntime.stepQueue, bfsRuntime.stepIndex,bfsRuntime.ms)})
   btnLast?.addEventListener("click",()=>{bfsRuntime.stepIndex = undoBfsStep(svg,bfsRuntime.stepQueue, bfsRuntime.stepIndex)})
 }
-
-
-
+  
 export function mount(container:HTMLElement){
-  const bfsRuntime : Runtime = {stepQueue: [], stepIndex: 0, ms: 1000};
+  const bfsRuntime : Runtime = {stepQueue: [], stepIndex: 0, ms: 1000, isAnimating: false};
   const matrixGraph : MatrixGraph = graph.matrixGraph;
-
   const svg = renderBfsUI(container,matrixGraph);
   generateBfsSteps(matrixGraph, bfsRuntime.stepQueue);
   bindBfsButtons(svg,bfsRuntime); 

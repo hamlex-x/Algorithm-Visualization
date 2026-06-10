@@ -1,6 +1,7 @@
 import { CANVAS, GRAPH, SVG } from "../shared/config.js";
 import { initSVG, wait } from "../shared/svg-utils.js";
 import type { BfsStep, MatrixGraph } from "../shared/types.js";
+import { animateCheckNode, animateVisitNode, dequeueBfsAnimation, enqueueBfsAnimation } from "../animations/graph-animations.js";
 
 
 //在svg中创建一个marker，并在其中写入箭头id=arrow
@@ -109,7 +110,7 @@ function renderGraph(svg:SVGSVGElement,graph:MatrixGraph){
   }
 }
 //执行stepQueue的下一步
-function executeBfsStep(svg:SVGSVGElement,stepQueue:BfsStep[],stepIndex:number):number{
+async function executeBfsStep(svg:SVGSVGElement,stepQueue:BfsStep[],stepIndex:number):Promise<number>{
   
   const node = svg?.getElementById(`node_circle_${stepQueue[stepIndex]?.nodeId}`);
   const nodes = svg?.getElementById("queue_g")?.querySelectorAll("rect"); 
@@ -125,49 +126,65 @@ function executeBfsStep(svg:SVGSVGElement,stepQueue:BfsStep[],stepIndex:number):
       let x = GRAPH.QUEUE_X+nodes!.length*GRAPH.QUEUE_CELL_WIDTH;
       let y = GRAPH.QUEUE_Y;
       const rect = document.createElementNS(SVG.NAMESPACE,"rect");
-      rect.setAttribute("x",`${x}`);
-      rect.setAttribute("y",`${y}`);
+      const text = document.createElementNS(SVG.NAMESPACE,"text");
+
       rect.setAttribute("width",`${GRAPH.QUEUE_CELL_WIDTH}`);
       rect.setAttribute("height",`${GRAPH.QUEUE_CELL_HEIGHT}`);
       rect.setAttribute("stroke","black");
       rect.setAttribute("fill","none");
       rect.setAttribute("stroke-width","4");
       rect.setAttribute("id",`queue_cell_rect_${stepQueue[stepIndex]?.nodeId}`);
-      
-      const text = document.createElementNS(SVG.NAMESPACE,"text");
-      text.setAttribute("x",`${x+GRAPH.QUEUE_CELL_WIDTH/2}`);
-      text.setAttribute("y",`${y+GRAPH.QUEUE_CELL_HEIGHT/2}`);
       text.setAttribute("font-size","20");
       text.setAttribute("font-family","Arial");
       text.setAttribute("text-anchor","middle");
       text.setAttribute("id",`queue_cell_text_${stepQueue[stepIndex]?.nodeId}`)
       text.textContent = `${stepQueue[stepIndex]?.nodeId}`;
-
       svg.getElementById("queue_g")!.appendChild(rect);
       svg.getElementById("queue_g")!.appendChild(text);
+      //初状态
+      let fromX = x+GRAPH.QUEUE_WIDTH;
+      let fromY = y;
+      rect.setAttribute("x", `0`);
+      rect.setAttribute("y", `0`);
+      text.setAttribute("x", `0`);
+      text.setAttribute("y", `0`);
+      //动画
+      await enqueueBfsAnimation(rect,text,fromX,fromY,x,y);
+
+      //末状态
+      rect.setAttribute("x",`${x}`);
+      rect.setAttribute("y",`${y}`);
+      text.setAttribute("x",`${x+GRAPH.QUEUE_CELL_WIDTH/2}`);
+      text.setAttribute("y",`${y+GRAPH.QUEUE_CELL_HEIGHT/2}`);
+      
       break;
     case "dequeue":
       introduce!.textContent = `节点${stepQueue[stepIndex]?.nodeId}出队`;
       node?.classList.remove("current");
       node?.classList.add("visited");
-      nodes?.forEach((el)=>{
-        if(Number(el.getAttribute("x")) - GRAPH.QUEUE_CELL_WIDTH >= GRAPH.QUEUE_X)
+      nodes?.forEach(async (el,i)=>{ 
+        const text = texts![i];
+        if(!text) return;
+        await dequeueBfsAnimation(el,text,Number(el.getAttribute("x")),Number(el.getAttribute("y")));
+        if(Number(el.getAttribute("x")) - GRAPH.QUEUE_CELL_WIDTH >= GRAPH.QUEUE_X){
           el.setAttribute("x",`${Number(el.getAttribute("x")) - GRAPH.QUEUE_CELL_WIDTH}`)
-        else el.remove();
+          text!.setAttribute("x",`${Number(text!.getAttribute("x")) - GRAPH.QUEUE_CELL_WIDTH}`)
+        }
+        else {
+          el.remove();
+          text?.remove();
+        }
       });
-      texts?.forEach((el)=>{
-        if(Number(el.getAttribute("x")) - GRAPH.QUEUE_CELL_WIDTH >= GRAPH.QUEUE_X)
-          el.setAttribute("x",`${Number(el.getAttribute("x")) - GRAPH.QUEUE_CELL_WIDTH}`)
-        else el.remove();
-        });
       break;
     case "check":
       introduce!.textContent = `检查节点${stepQueue[stepIndex]?.nodeId}的相邻并且未被访问的节点`;
+      animateCheckNode(node as SVGElement);
       break;
     case "visit":
       introduce!.textContent = `访问节点${stepQueue[stepIndex]?.nodeId}`;
       node?.classList.remove("unvisited");
       node?.classList.add("current");
+      await animateVisitNode(node as SVGElement);
       break;
     default:
       break;
@@ -253,7 +270,7 @@ function undoBfsStep(svg:SVGSVGElement,stepQueue:BfsStep[],stepIndex:number):num
 async function executeAllBfsSteps(svg:SVGSVGElement,stepQueue:BfsStep[],stepIndex:number,ms:number):Promise<number>{
   const introduce = svg?.getElementById("info_text");
   while(stepIndex<stepQueue.length){
-    stepIndex = executeBfsStep(svg,stepQueue,stepIndex);
+    stepIndex = await executeBfsStep(svg,stepQueue,stepIndex);
     await wait(ms);
   }
   if(stepIndex >= stepQueue.length) {

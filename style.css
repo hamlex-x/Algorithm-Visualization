@@ -19,7 +19,7 @@
 }
 .node.visited {
   fill: #dbeafe;
-  stroke: #3b82f6;
+  stroke: #3b77d7;
 }
 .node.unvisited {
     fill: #fff7ed;
