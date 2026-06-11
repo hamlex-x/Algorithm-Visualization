@@ -1,5 +1,5 @@
 import { graph } from "../shared/state.js";
-import { resizeGraphMatrixTable, renderCreateUI } from "../renderers/graph-matrix-create-renderer.js";
+import { resizeGraphMatrixTable, renderCreateUI, renderMatrixMain, renderEdgeListMain } from "../renderers/graph-matrix-create-renderer.js";
 import { buildGraphMatrix } from "../builders/graph-matrix-builder.js";
 
 
@@ -44,25 +44,53 @@ function bindMatrixTableValidation(graphMatrixTable: HTMLTableElement) {
               });
           }
       }
-  }
-
-//创建确定按钮并增加事件监听器
-function renderEnsureButton(container:HTMLElement):HTMLButtonElement{
-    const btn = document.createElement("button");
-    btn.textContent = "确定";
-    container.appendChild(btn);
-    return btn;
 }
-function bindEnsureButton (btn:HTMLButtonElement){
+//为确定按钮添加事件监听器
+function bindMatrixEnsureButton (btn:HTMLButtonElement){
     btn.addEventListener("click",()=>{
         graph.representation = "matrix";
         graph.matrixGraph = buildGraphMatrix(readGraphMatrix());
         location.hash = "#/list";
     })
 }
-export function mount(container:HTMLElement){
-    const graphMatrixTable = renderCreateUI(container);
+//为边列表创建时textarea添加事件监听器
+function bindEdgeListTextarea(textarea:HTMLTextAreaElement){
+    
+}
+function bindEdgeListEnsureButton(btn:HTMLButtonElement){
+    
+}
+//为创建导航栏添加事件监听器
+function bindCreateNav(nav:HTMLElement,main:HTMLElement){
+    const navItems = nav.querySelectorAll(".create-graph-nav-item");
+    navItems[0]!.addEventListener("click",()=>{
+        main.innerHTML = "";
+        const {
+        graphMatrixTable,
+        btn
+    } = renderMatrixMain(main);
     bindGraphMatrixInput(graphMatrixTable);
-    const btn = renderEnsureButton(container);
-    bindEnsureButton(btn);
+    bindMatrixEnsureButton(btn);
+    });
+    navItems[1]!.addEventListener("click",()=>{
+        main.innerHTML = "";
+        const {
+        textarea,
+        btn
+    } = renderEdgeListMain(main);
+    bindEdgeListTextarea(textarea);
+    bindEdgeListEnsureButton(btn);
+    })
+
+}
+export function mount(container:HTMLElement){
+    const {
+        graphMatrixTable,
+        btn,
+        nav,
+        main
+    } = renderCreateUI(container);
+    bindGraphMatrixInput(graphMatrixTable);
+    bindMatrixEnsureButton(btn);
+    bindCreateNav(nav,main);
 }

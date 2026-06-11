@@ -39,12 +39,12 @@ export function mount(container:HTMLElement){
     const svg = renderListUI(container);
     bindAlgoListEvents(svg);
     bindCategoryTreeEvents(svg);
-//     //测试
-// graph.representation = "matrix";
-// graph.matrixGraph = buildGraphMatrix([
-//     [0,1,1,1],
-//     [1,0,1,1],
-//     [1,1,0,1],
-//     [1,1,0,0]
-// ]);
+//测试
+graph.representation = "matrix";
+graph.matrixGraph = buildGraphMatrix([
+    [0,1,1,1],
+    [1,0,1,1],
+    [1,1,0,1],
+    [1,1,0,0]
+]);
 }

@@ -19,7 +19,7 @@
 }
 .node.visited {
   fill: #dbeafe;
-  stroke: #3b77d7;
+  stroke: #2367d4;
 }
 .node.unvisited {
     fill: #fff7ed;
@@ -28,4 +28,57 @@
 .node.current {
   fill: #fef3c7;
   stroke: #f59e0b;
+}
+/* 全局nav */
+.router-nav{
+  display:flex;
+  gap : 50px;
+  justify-content:flex-start;
+  align-items:center;
+  height:60px;
+  width:100%;
+  border: 1px solid black;
+  /* position: fixed; */
+}
+
+#app {
+  display:flex;
+  flex-direction:column;
+  height:100vh;
+}
+/* 图创建页面css */
+.create-graph-nav{
+  display:flex;
+  gap : 50px;
+  justify-content:center;
+  align-items:center;
+  height:60px;
+  width:100%;
+  border: 1px solid black;
+}
+.create-graph-nav-item{
+  cursor:pointer;
+  flex:1;
+  height:40px;
+  border: 1px solid black;
+}
+.create-graph-main{
+  display:flex;
+  flex-direction:column;
+  flex:1;
+  border: 1px solid black;
+}
+.create-graph-title{
+  align-self: center;/* 元素外交叉轴居中 */
+  height: 30px;
+  width: 30%;
+  text-align: center;/* 元素内水平居中 */
+}
+.create-graph-table{
+  height: auto;
+  width: 30%;
+}
+.create-graph-textarea{
+  height: auto;
+  width: 30%;
 }

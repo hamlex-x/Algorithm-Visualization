@@ -1,63 +1,68 @@
 import type {BfsStep} from '../shared/types.js';
-//弧数据
-interface ALdata  {
-    info:number,
-    adjvex:number,
-}
 //弧结点
-interface ArcNode {
-    data:ALdata,
-    next:ArcNode|null
+interface ArcNode<T> {
+    info:T,
+    adjvex:number,
+    next:ArcNode<T>|null
 }
 //顶点结点
-interface VNode {
-    Vdata:number,
-    firstArc:ArcNode|null
+interface VNode<T> {
+    VId:number,
+    Vdata:T,
+    firstArc:ArcNode<T>|null
 }
 
 
-const vnode0:VNode = {
+const vnode0:VNode<number> = {
+    VId:0,
     Vdata:0,
     firstArc:{
-        data:{info:1,adjvex:2},
+        info:1,adjvex:2,
         next:{
-            data:{info:1,adjvex:3},
+            info:1,adjvex:3,
             next:null
         }
     }
 }
-const vnode1:VNode = {
+const vnode1:VNode<number> = {
+    VId:1,
     Vdata:1,
     firstArc:{
-        data:{info:1,adjvex:3},
+        info:1,adjvex:3,
         next:null
     }
 }
-const vnode2:VNode = {
+const vnode2:VNode<number> = {
+    VId:2,
     Vdata:2,
     firstArc:{
-        data:{info:1,adjvex:0},
+        info:1,adjvex:0,
         next:{
-            data:{info:1,adjvex:3},
+            info:1,adjvex:3,
             next:null
         }
     }
 }
-const vnode3:VNode = {
+const vnode3:VNode<number> = {
+    VId:3,
     Vdata:3,
     firstArc:{
-        data:{info:1,adjvex:0},
+        info:1,adjvex:0,
         next:{
-            data:{info:1,adjvex:1},
+            info:1,adjvex:1,
             next:{
-                data:{info:1,adjvex:2},
+                info:1,adjvex:2,
                 next:null
             }
         }
     }
 }
-const ALGraph:VNode[] = [vnode0,vnode1,vnode2,vnode3];
+const ALGraph:VNode<number>[] = [vnode0,vnode1,vnode2,vnode3];
 
+function builderALGraphByEdgeList(ALGraph:VNode<any>[]):VNode<any>[]{
+    const t : VNode<any>[] = [];
+    return t;
+}
 // function renderGraph(graph:MatrixGraph){
 //   const svg = document.querySelector("svg");
 //   if (!svg) return;
@@ -107,13 +112,13 @@ const ALGraph:VNode[] = [vnode0,vnode1,vnode2,vnode3];
 //     svg.appendChild(label);
 //   }
 // }
-function renderNodes(){
+// function renderNodes(){
     
-}
-function renderGraph(graph:ALdata[]){
+// }
+// function renderGraph(graph:ALdata[]){
 
-}
+// }
 
-function generateBfsSteps(graph:ALdata[],stepQueue:BfsStep[]){
+// function generateBfsSteps(graph:ALdata[],stepQueue:BfsStep[]){
 
-}
+// }

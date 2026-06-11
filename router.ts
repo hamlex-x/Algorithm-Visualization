@@ -8,12 +8,11 @@ function routerNav(container:HTMLElement){
     const list = document.createElement("a");
     list.href = "#/list";
     list.textContent = "目录";
-
     list.addEventListener("click",(e)=>{
         e.preventDefault();
         location.hash = "#/list";
     });
-    
+    nav.setAttribute("class","router-nav");
     nav.appendChild(list);
     container.appendChild(nav);
 }
