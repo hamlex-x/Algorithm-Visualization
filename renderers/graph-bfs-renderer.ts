@@ -1,6 +1,6 @@
 import { CANVAS, GRAPH, SVG } from "../shared/config.js";
 import { initSVG, wait } from "../shared/svg-utils.js";
-import type { BfsStep, MatrixGraph } from "../shared/types.js";
+import type { AListGraph, ArcNode, BfsStep, MatrixGraph } from "../shared/types.js";
 import { animateCheckNode, animateVisitNode, dequeueBfsAnimation, enqueueBfsAnimation } from "../animations/graph-animations.js";
 
 
@@ -60,8 +60,59 @@ function renderInfoText(svg:SVGSVGElement){
   introduce.textContent = ``;
   svg?.appendChild(introduce);
 }
+function renderAdLGraph(svg:SVGSVGElement,graph:AListGraph<string>){
+  if (!svg) return;
+  //画线
+  graph.adList.forEach((node)=>{
+    if(node.firstArc === null) return;
+    let arc: ArcNode | null = node.firstArc;
+    let i = node.VId;
+    while(arc !== null){
+      const line = document.createElementNS(SVG.NAMESPACE,"line");
+      let j = arc.adjvex;
+      let x1 = graph.nodes[i]!.x;
+      let y1 = graph.nodes[i]!.y;
+      let x2 = graph.nodes[j]!.x;
+      let y2 = graph.nodes[j]!.y;
+      let hypotenuse = Math.sqrt(Math.pow(x1-x2,2)+Math.pow(y1-y2,2));
+
+      let x3 = x2 + GRAPH.NODE_RADIUS*(x1-x2)/hypotenuse;
+      let y3 = y2 + GRAPH.NODE_RADIUS*(y1-y2)/hypotenuse;
+      line.setAttribute("x1",`${x1}`);
+      line.setAttribute("y1",`${y1}`);
+      line.setAttribute("x2",`${x3}`);
+      line.setAttribute("y2",`${y3}`);
+      line.setAttribute("stroke","black");
+      line.setAttribute("stroke-width","4"); 
+      line.setAttribute("marker-end","url(#svg_arrow_marker)")
+      line.setAttribute("id",`edge_line_${i}_${j}`);
+      svg.appendChild(line);
+      arc = arc.next;
+    }
+  })
+  for(let i=0;i<graph.cnt;i++){
+    //节点
+    const node = document.createElementNS(SVG.NAMESPACE,"circle");
+    node.setAttribute("cx",`${graph.nodes[i]?.x}`);
+    node.setAttribute("cy",`${graph.nodes[i]?.y}`);
+    node.setAttribute("r",`${GRAPH.NODE_RADIUS}`);
+    node.setAttribute("id",`node_circle_${i}`);
+    node.classList.add("node");
+    //文本
+    const label = document.createElementNS(SVG.NAMESPACE,"text");
+    label.setAttribute("x",`${graph.nodes[i]?.x}`);
+    label.setAttribute("y",`${graph.nodes[i]?.y}`);
+    label.setAttribute("font-size","20");
+    label.setAttribute("font-family","Arial");
+    label.setAttribute("text-anchor","middle");
+    label.textContent = `${graph.nodes[i]!.label}`;
+  //绘制
+    svg.appendChild(node);
+    svg.appendChild(label);
+  }
+}
 //将MatrixGraph渲染到svg中节点id为对应节点下标，线段号为发出节点号-指向节点号
-function renderGraph(svg:SVGSVGElement,graph:MatrixGraph){
+function renderMatrixGraph(svg:SVGSVGElement,graph:MatrixGraph){
   if (!svg) return;
   //画线
   for(let i=0;i<graph.cnt;i++){
@@ -103,15 +154,14 @@ function renderGraph(svg:SVGSVGElement,graph:MatrixGraph){
     label.setAttribute("font-size","20");
     label.setAttribute("font-family","Arial");
     label.setAttribute("text-anchor","middle");
-    label.textContent = `${i}`
+    label.textContent = `${graph.nodes[i]!.label}`;
    //绘制
     svg.appendChild(node);
     svg.appendChild(label);
   }
 }
 //执行stepQueue的下一步
-async function executeBfsStep(svg:SVGSVGElement,stepQueue:BfsStep[],stepIndex:number):Promise<number>{
-  
+async function executeBfsStep(svg:SVGSVGElement,stepQueue:BfsStep[],stepIndex:number,graph:MatrixGraph|AListGraph<string>):Promise<number>{
   const node = svg?.getElementById(`node_circle_${stepQueue[stepIndex]?.nodeId}`);
   const nodes = svg?.getElementById("queue_g")?.querySelectorAll("rect"); 
   const texts = svg?.getElementById("queue_g")?.querySelectorAll("text");
@@ -122,7 +172,7 @@ async function executeBfsStep(svg:SVGSVGElement,stepQueue:BfsStep[],stepIndex:nu
   }
   switch (stepQueue[stepIndex]?.action){
     case "enqueue":
-      introduce!.textContent = `节点${stepQueue[stepIndex]?.nodeId}入队`;
+      introduce!.textContent = `节点${graph.nodes[stepQueue[stepIndex]!.nodeId]!.label}入队`;
       let x = GRAPH.QUEUE_X+nodes!.length*GRAPH.QUEUE_CELL_WIDTH;
       let y = GRAPH.QUEUE_Y;
       const rect = document.createElementNS(SVG.NAMESPACE,"rect");
@@ -138,7 +188,7 @@ async function executeBfsStep(svg:SVGSVGElement,stepQueue:BfsStep[],stepIndex:nu
       text.setAttribute("font-family","Arial");
       text.setAttribute("text-anchor","middle");
       text.setAttribute("id",`queue_cell_text_${stepQueue[stepIndex]?.nodeId}`)
-      text.textContent = `${stepQueue[stepIndex]?.nodeId}`;
+      text.textContent = graph.nodes[stepQueue[stepIndex]!.nodeId]!.label;
       svg.getElementById("queue_g")!.appendChild(rect);
       svg.getElementById("queue_g")!.appendChild(text);
       //初状态
@@ -159,7 +209,7 @@ async function executeBfsStep(svg:SVGSVGElement,stepQueue:BfsStep[],stepIndex:nu
       
       break;
     case "dequeue":
-      introduce!.textContent = `节点${stepQueue[stepIndex]?.nodeId}出队`;
+      introduce!.textContent = `节点${graph.nodes[stepQueue[stepIndex]!.nodeId]!.label}出队`;
       node?.classList.remove("current");
       node?.classList.add("visited");
       nodes?.forEach(async (el,i)=>{ 
@@ -177,11 +227,11 @@ async function executeBfsStep(svg:SVGSVGElement,stepQueue:BfsStep[],stepIndex:nu
       });
       break;
     case "check":
-      introduce!.textContent = `检查节点${stepQueue[stepIndex]?.nodeId}的相邻并且未被访问的节点`;
+      introduce!.textContent = `检查节点${graph.nodes[stepQueue[stepIndex]!.nodeId]!.label}的相邻并且未被访问的节点`;
       animateCheckNode(node as SVGElement);
       break;
     case "visit":
-      introduce!.textContent = `访问节点${stepQueue[stepIndex]?.nodeId}`;
+      introduce!.textContent = `访问节点${graph.nodes[stepQueue[stepIndex]!.nodeId]!.label}`;
       node?.classList.remove("unvisited");
       node?.classList.add("current");
       await animateVisitNode(node as SVGElement);
@@ -192,7 +242,7 @@ async function executeBfsStep(svg:SVGSVGElement,stepQueue:BfsStep[],stepIndex:nu
   return stepIndex+1;
 }
 //撤回stepQueue中的上一步
-function undoBfsStep(svg:SVGSVGElement,stepQueue:BfsStep[],stepIndex:number):number{
+function undoBfsStep(svg:SVGSVGElement,stepQueue:BfsStep[],stepIndex:number,graph:MatrixGraph|AListGraph<string>):number{
   if(stepIndex <= 0) return 0 ;
   stepIndex -= 1;
   const node = svg?.getElementById(`node_circle_${stepQueue[stepIndex]?.nodeId}`);
@@ -226,7 +276,7 @@ function undoBfsStep(svg:SVGSVGElement,stepQueue:BfsStep[],stepIndex:number):num
       text.setAttribute("font-family","Arial");
       text.setAttribute("text-anchor","middle");
       text.setAttribute("id",`queue_cell_text_${stepQueue[stepIndex]?.nodeId}`)
-      text.textContent = `${stepQueue[stepIndex]?.nodeId}`;
+      text.textContent = graph.nodes[stepQueue[stepIndex]!.nodeId]!.label;
 
       svg.getElementById("queue_g")!.appendChild(rect);
       svg.getElementById("queue_g")!.appendChild(text);
@@ -250,16 +300,16 @@ function undoBfsStep(svg:SVGSVGElement,stepQueue:BfsStep[],stepIndex:number):num
   else
   switch(stepQueue[stepIndex-1]?.action){
     case "enqueue":
-      introduce!.textContent = `节点${stepQueue[stepIndex-1]?.nodeId}入队`;
+      introduce!.textContent = `节点${graph.nodes[stepQueue[stepIndex-1]!.nodeId]!.label}入队`;
       break;
     case "dequeue":
-      introduce!.textContent = `节点${stepQueue[stepIndex-1]?.nodeId}出队`;
+      introduce!.textContent = `节点${graph.nodes[stepQueue[stepIndex-1]!.nodeId]!.label}出队`;
       break;
     case "check":
-      introduce!.textContent = `检查节点${stepQueue[stepIndex-1]?.nodeId}的相邻并且未被访问的节点`;
+      introduce!.textContent = `检查节点${graph.nodes[stepQueue[stepIndex-1]!.nodeId]!.label}的相邻并且未被访问的节点`;
       break;
     case "visit":
-      introduce!.textContent = `访问节点${stepQueue[stepIndex-1]?.nodeId}`;
+      introduce!.textContent = `访问节点${graph.nodes[stepQueue[stepIndex-1]!.nodeId]!.label}`;
       break;
     default:
       break;
@@ -267,10 +317,10 @@ function undoBfsStep(svg:SVGSVGElement,stepQueue:BfsStep[],stepIndex:number):num
   return stepIndex;
 }
 //执行stepQueue中的所有步骤
-async function executeAllBfsSteps(svg:SVGSVGElement,stepQueue:BfsStep[],stepIndex:number,ms:number):Promise<number>{
+async function executeAllBfsSteps(svg:SVGSVGElement,stepQueue:BfsStep[],stepIndex:number,graph:MatrixGraph|AListGraph<string>,ms:number):Promise<number>{
   const introduce = svg?.getElementById("info_text");
   while(stepIndex<stepQueue.length){
-    stepIndex = await executeBfsStep(svg,stepQueue,stepIndex);
+    stepIndex = await executeBfsStep(svg,stepQueue,stepIndex,graph);
     await wait(ms);
   }
   if(stepIndex >= stepQueue.length) {
@@ -309,11 +359,11 @@ function renderBfsTitle(container:HTMLElement){
 function renderBfsUI(container:HTMLElement,graph:MatrixGraph):SVGSVGElement{
   renderBfsTitle(container);
   const svg = initSVG(container);      
-  renderArrowMarker(svg);              
-  renderGraph(svg, graph);             
+  renderArrowMarker(svg);             
+  renderMatrixGraph(svg, graph);             
   renderQueue(svg);                    
   renderInfoText(svg);                 
   renderBfsButton(container);
   return svg;                          
 }
-export{renderBfsUI,executeBfsStep,undoBfsStep,executeAllBfsSteps}
+export{executeBfsStep,undoBfsStep,executeAllBfsSteps,renderBfsTitle,initSVG,renderArrowMarker,renderMatrixGraph,renderQueue,renderInfoText,renderBfsButton,renderAdLGraph}

@@ -11,7 +11,7 @@
 4. 检测相邻节点
 */
 import { Queue } from "../shared/datastruct.js"
-import type { MatrixGraph,BfsStep } from "../shared/types.js"
+import type { MatrixGraph,BfsStep, AListGraph } from "../shared/types.js"
 
 //用于将step快速的加入stepQueue
 function pushBfsStep(stepQueue:BfsStep[],action:"enqueue"|"dequeue"|"visit"|"check",nodeId:number){
@@ -20,7 +20,7 @@ function pushBfsStep(stepQueue:BfsStep[],action:"enqueue"|"dequeue"|"visit"|"che
 }
 
 //完成bfs所有步骤并且存到stepQueu中
-function generateBfsSteps(graph:MatrixGraph,stepQueue:BfsStep[]){
+function generateBfsStepsMatrix(graph:MatrixGraph,stepQueue:BfsStep[]){
   const visited:boolean[] = new Array(graph.cnt).fill(false);
   const queue = new Queue<number>();
   pushBfsStep(stepQueue,"visit",0);
@@ -42,5 +42,31 @@ function generateBfsSteps(graph:MatrixGraph,stepQueue:BfsStep[]){
     }
   }
 }
+function generateBfsStepsAL(graph:AListGraph<string>,stepQueue:BfsStep[]){
+  const visited:boolean[] = new Array(graph.cnt).fill(false);
+  const queue = new Queue<number>();
+  pushBfsStep(stepQueue,"visit",0);
+  visited[0] = true;
+  pushBfsStep(stepQueue,"enqueue",0);
+  queue.enqueue(0);
+  while(queue.empty() === false){
+    const u = queue.dequeue();
+    if(u === undefined) continue;
+    pushBfsStep(stepQueue,"dequeue",u);
+    pushBfsStep(stepQueue,"check",u);
+    let node = graph.adList[u];
+    let arc = node?.firstArc;
+    while(arc !== null){
+      const v = arc!.adjvex;
+      if(visited[v] === false){
+        pushBfsStep(stepQueue,"visit",v);
+        visited[v] = true;
+        pushBfsStep(stepQueue,"enqueue",v);
+        queue.enqueue(v);
+      }
+      arc = arc!.next;
+    }
+  }
+}
 
-export{pushBfsStep,generateBfsSteps}
+export{pushBfsStep,generateBfsStepsMatrix,generateBfsStepsAL}

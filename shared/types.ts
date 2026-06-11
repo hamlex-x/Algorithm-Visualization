@@ -24,4 +24,22 @@ interface Runtime {
   ms: number;
   isAnimating: boolean;
 }
-export type {GraphNode,MatrixGraph,BfsStep,Runtime}
+
+//弧结点
+interface ArcNode {
+    info:number,
+    adjvex:number,
+    next:ArcNode|null
+}
+//顶点结点
+interface VNode<T> {
+    VId:number,
+    Vdata:T,
+    firstArc:ArcNode|null
+}
+interface AListGraph<T> {
+    nodes : GraphNode[],
+    adList : VNode<T>[],
+    cnt : number,
+}
+export type {GraphNode,MatrixGraph,BfsStep,Runtime,ArcNode,VNode,AListGraph}

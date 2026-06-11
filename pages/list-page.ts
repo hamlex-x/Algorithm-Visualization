@@ -27,7 +27,7 @@ function bindAlgoListEvents(svg:SVGSVGElement){
 
     //添加页面跳转
     bfsRect!.addEventListener("click", () => {
-        if(graph.matrixGraph.matrix.length === 0) {
+        if(graph.matrixGraph.matrix.length === 0 && graph.adLGraph.adList.length === 0){
             alert("请先点击‘图’创建矩阵");
             return;
         }
@@ -40,11 +40,11 @@ export function mount(container:HTMLElement){
     bindAlgoListEvents(svg);
     bindCategoryTreeEvents(svg);
 //测试
-graph.representation = "matrix";
-graph.matrixGraph = buildGraphMatrix([
-    [0,1,1,1],
-    [1,0,1,1],
-    [1,1,0,1],
-    [1,1,0,0]
-]);
+// graph.representation = "matrix";
+// graph.matrixGraph = buildGraphMatrix([
+//     [0,1,1,1],
+//     [1,0,1,1],
+//     [1,1,0,1],
+//     [1,1,0,0]
+// ]);
 }

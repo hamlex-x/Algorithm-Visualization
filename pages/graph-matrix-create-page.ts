@@ -1,9 +1,10 @@
 import { graph } from "../shared/state.js";
 import { resizeGraphMatrixTable, renderCreateUI, renderMatrixMain, renderEdgeListMain } from "../renderers/graph-matrix-create-renderer.js";
-import { buildGraphMatrix } from "../builders/graph-matrix-builder.js";
+import { builderAListGraph, buildGraphMatrix } from "../builders/graph-matrix-builder.js";
+import type { VNode } from "../shared/types.js";
 
 
-//根据输入数据建立邻接表
+//根据输入数据建立邻接矩阵
 function readGraphMatrix():number[][]{
     const graphMatrixTable = document.getElementById("graph_table_matrix");
     const trs = graphMatrixTable!.querySelectorAll("tbody tr");
@@ -53,12 +54,70 @@ function bindMatrixEnsureButton (btn:HTMLButtonElement){
         location.hash = "#/list";
     })
 }
+//通过边列表创建邻接表
+function readALGraphByEdgeList():VNode<string>[]{
+    const adList:VNode<string>[] = [];
+    const textarea  = document.getElementById("graph_textarea") as HTMLTextAreaElement;
+    const text = textarea.value;
+    const lines = text.split(/\r?\n/);
+    const vertexMap = new Map<string, number>();//存所有Vnode的(Vdata,VId)
+    function getOrCreateVertex(name:string):number{
+        if(vertexMap.has(name))
+            return vertexMap.get(name)!;
+        adList.push({
+            VId:adList.length,
+            Vdata:name,
+            firstArc:null
+        })
+        vertexMap.set(name,adList.length-1);
+        return adList.length-1;
+    }
+    function addArc(from:number,to:number){
+        const node = adList[from] as VNode<string>;
+        let lastArc = node.firstArc;
+        while(lastArc !== null &&
+            lastArc.adjvex !== to &&
+            lastArc?.next !== null 
+            ) lastArc = lastArc.next;
+        
+        if(lastArc === null){
+            node.firstArc = {
+            info:1,
+            adjvex:to,
+            next:null
+            }
+        }else if(lastArc.adjvex === to){
+
+        }
+        else if(lastArc?.next === null ){
+            lastArc!.next = {
+            info:1,
+            adjvex:to,
+            next:null
+            }
+        }
+    }
+    lines.forEach((line)=>{
+        const words = line.split('-');
+        if(words[1] === undefined) return;
+        let w1Index = getOrCreateVertex(words[1]);
+        //找到words[0]对应的Vnode的最后一个弧结点并在不重复并且不是自环的前提下添加新弧，若words没有对应的Vnode则新建 
+        if(words[0] === words[1]) return;
+        addArc(getOrCreateVertex(words[0] as string),w1Index);
+    })
+    return adList;
+}
+//
 //为边列表创建时textarea添加事件监听器
 function bindEdgeListTextarea(textarea:HTMLTextAreaElement){
     
 }
 function bindEdgeListEnsureButton(btn:HTMLButtonElement){
-    
+    btn.addEventListener("click",()=>{
+        graph.representation = "adlist";
+        graph.adLGraph = builderAListGraph(readALGraphByEdgeList());
+        location.hash = "#/list";
+    })
 }
 //为创建导航栏添加事件监听器
 function bindCreateNav(nav:HTMLElement,main:HTMLElement){

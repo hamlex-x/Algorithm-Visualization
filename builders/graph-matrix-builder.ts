@@ -1,5 +1,5 @@
 import { GRAPH } from "../shared/config.js";
-import type { GraphNode, MatrixGraph } from "../shared/types.js";
+import type { AListGraph, GraphNode, MatrixGraph, VNode } from "../shared/types.js";
 
 //创建nodes为默认值
 function createNodes(cnt:number):GraphNode[]{
@@ -27,4 +27,16 @@ function buildGraphMatrix(matrix:number[][]):MatrixGraph{
   calcCircleLayout(graphMatrix.nodes,GRAPH.LAYOUT_RADIUS,GRAPH.LAYOUT_CENTER_X,GRAPH.LAYOUT_CENTER_Y);
   return graphMatrix;
 }
-export{buildGraphMatrix,createNodes}
+//完成对整个graph.adLGraph的初始化
+function builderAListGraph(adList:VNode<string>[]):AListGraph<string>{
+  const graphAList:AListGraph<string> = {adList:adList,cnt:0,nodes:[]};
+  graphAList.adList = adList;
+  graphAList.cnt = adList.length;
+  graphAList.nodes = createNodes(graphAList.cnt);
+  for (let i = 0; i < adList.length; i++) {
+    graphAList.nodes[i]!.label = adList[i]!.Vdata;
+  }
+  calcCircleLayout(graphAList.nodes,GRAPH.LAYOUT_RADIUS,GRAPH.LAYOUT_CENTER_X,GRAPH.LAYOUT_CENTER_Y);
+  return graphAList;
+}
+export{buildGraphMatrix,builderAListGraph,createNodes}
