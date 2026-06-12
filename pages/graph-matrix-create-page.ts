@@ -1,7 +1,9 @@
 import { graph } from "../shared/state.js";
-import { resizeGraphMatrixTable, renderCreateUI, renderMatrixMain, renderEdgeListMain } from "../renderers/graph-matrix-create-renderer.js";
+import { resizeGraphMatrixTable, renderCreateUI, renderMatrixMain, renderEdgeListMain, renderVisualMain } from "../renderers/graph-matrix-create-renderer.js";
 import { builderAListGraph, buildGraphMatrix } from "../builders/graph-matrix-builder.js";
-import type { VNode } from "../shared/types.js";
+import type { AListGraph, GraphNode, VNode } from "../shared/types.js";
+import { getSVGPoint } from "../shared/svg-utils.js";
+import { renderAdLGraph } from "../renderers/graph-bfs-renderer.js";
 
 
 //根据输入数据建立邻接矩阵
@@ -119,6 +121,53 @@ function bindEdgeListEnsureButton(btn:HTMLButtonElement){
         location.hash = "#/list";
     })
 }
+function bindVisualSvg(svg:SVGSVGElement,adLGraph:AListGraph<string>){
+    //找最小的缺失数字
+    function findSmallestMissingLabel(nodes: GraphNode[]): number {
+      const labels = new Set(nodes.map(n => Number(n.label)));
+      let i = 0;
+      while (labels.has(i)) i++;
+      return i;
+  }
+    //点击空白处添加节点
+    svg.addEventListener("dblclick",(e)=>{
+        e.preventDefault()
+        const pt = getSVGPoint(svg,e);
+        if(e.target === svg){
+            adLGraph.nodes.push({x:pt.x,y:pt.y,label: `${findSmallestMissingLabel(adLGraph.nodes)}`,status:"unvisited"});
+            adLGraph.adList.push({VId:adLGraph.cnt,Vdata:`${adLGraph.cnt}`,firstArc:null});
+            adLGraph.cnt++;
+        }
+        renderAdLGraph(svg,adLGraph); 
+    })
+    //右键删除节点
+    svg.addEventListener("contextmenu",(e)=>{
+        e.preventDefault()
+        const circle = (e.target as Element).closest("circle");
+        if (!circle) return;
+        const vid = circle.dataset.vid;
+        if(vid === undefined) return;
+        for(let i=0;i<adLGraph.cnt;i++){
+            if(adLGraph.adList[i]!.VId === Number(vid)){
+                adLGraph.nodes.splice(i,1);
+                adLGraph.adList.splice(i,1);
+                adLGraph.cnt--;
+            }
+        }
+        for (let i = 0; i < adLGraph.adList.length; i++) {
+            adLGraph.adList[i]!.VId = i;
+        }
+        
+        renderAdLGraph(svg,adLGraph); 
+    })
+}
+function bindVisualEnsureButton(btn:HTMLButtonElement,adLgraph:AListGraph<string>){
+    btn.addEventListener("click",()=>{
+        graph.representation = "adlist";
+        graph.adLGraph = adLgraph;
+        location.hash = "#/list";
+    })
+}
 //为创建导航栏添加事件监听器
 function bindCreateNav(nav:HTMLElement,main:HTMLElement){
     const navItems = nav.querySelectorAll(".create-graph-nav-item");
@@ -140,7 +189,20 @@ function bindCreateNav(nav:HTMLElement,main:HTMLElement){
     bindEdgeListTextarea(textarea);
     bindEdgeListEnsureButton(btn);
     })
-
+    navItems[2]!.addEventListener("click",()=>{
+        const adLgraph:AListGraph<string> ={
+            nodes:[],
+            adList:[],
+            cnt:0
+        }
+        main.innerHTML = "";
+        const {
+            svg,
+            btn
+        } = renderVisualMain(main);
+        bindVisualSvg(svg,adLgraph);    
+        bindVisualEnsureButton(btn,adLgraph);
+    });
 }
 export function mount(container:HTMLElement){
     const {

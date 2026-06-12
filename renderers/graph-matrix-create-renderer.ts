@@ -1,3 +1,5 @@
+import { initSVG } from "../shared/svg-utils.js";
+
 //创建图创建导航栏
 function renderGraphCreateNav(container:HTMLElement):HTMLElement{
     const nav = document.createElement("nav");
@@ -146,5 +148,28 @@ function renderCreateUI(container:HTMLElement){
         main
     }
 }
-
-export {renderCreateUI,resizeGraphMatrixTable,renderMatrixMain,renderEdgeListMain}
+function renderEnsureButtonVisual(container:HTMLElement):HTMLButtonElement{
+    const btn = document.createElement("button");
+    btn.textContent = "使用此图";
+    btn.style.width = "100px";
+    btn.style.alignSelf = "center";
+    btn.setAttribute("style","");
+    container.appendChild(btn);
+    return btn;
+}
+//渲染可视化建图main的全部
+function renderVisualMain(main:HTMLElement){
+    renderGraphVisualTitle(main);
+    const svg = initSVG(main);
+    const btn = renderEnsureButtonVisual(main);
+    svg.setAttribute("class","create-graph-svg");
+    return {svg,btn};
+}
+//渲染可视化建图标题
+function renderGraphVisualTitle(container:HTMLElement){
+    const title = document.createElement("h2");
+    title.textContent = "可视化创建图";
+    title.setAttribute("class","create-graph-title");
+    container.appendChild(title);
+}
+export {renderCreateUI,resizeGraphMatrixTable,renderMatrixMain,renderEdgeListMain,renderVisualMain}

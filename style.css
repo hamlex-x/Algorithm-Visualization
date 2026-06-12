@@ -82,3 +82,9 @@
   height: auto;
   width: 30%;
 }
+.create-graph-svg{
+  border: 2px solid black;
+  align-self: center;
+  user-select: none;
+  -webkit-user-select: none;
+}

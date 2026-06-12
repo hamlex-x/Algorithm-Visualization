@@ -62,6 +62,7 @@ function renderInfoText(svg:SVGSVGElement){
 }
 function renderAdLGraph(svg:SVGSVGElement,graph:AListGraph<string>){
   if (!svg) return;
+  svg.innerHTML = "";
   //画线
   graph.adList.forEach((node)=>{
     if(node.firstArc === null) return;
@@ -97,6 +98,7 @@ function renderAdLGraph(svg:SVGSVGElement,graph:AListGraph<string>){
     node.setAttribute("cy",`${graph.nodes[i]?.y}`);
     node.setAttribute("r",`${GRAPH.NODE_RADIUS}`);
     node.setAttribute("id",`node_circle_${i}`);
+    node.dataset.vid = `${graph.adList[i]?.VId}`
     node.classList.add("node");
     //文本
     const label = document.createElementNS(SVG.NAMESPACE,"text");
@@ -366,4 +368,4 @@ function renderBfsUI(container:HTMLElement,graph:MatrixGraph):SVGSVGElement{
   renderBfsButton(container);
   return svg;                          
 }
-export{executeBfsStep,undoBfsStep,executeAllBfsSteps,renderBfsTitle,initSVG,renderArrowMarker,renderMatrixGraph,renderQueue,renderInfoText,renderBfsButton,renderAdLGraph}
+export{executeBfsStep,undoBfsStep,executeAllBfsSteps,renderBfsTitle,renderArrowMarker,renderMatrixGraph,renderQueue,renderInfoText,renderBfsButton,renderAdLGraph}

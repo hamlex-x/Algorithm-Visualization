@@ -1,7 +1,8 @@
-import type { MatrixGraph,BfsStep, Runtime, AListGraph } from "../shared/types.js"
+import type { MatrixGraph, Runtime, AListGraph } from "../shared/types.js"
 import { generateBfsStepsAL, generateBfsStepsMatrix } from "../algos/graph-matrix-bfs-algo.js";
-import { executeAllBfsSteps, executeBfsStep, undoBfsStep,  renderBfsTitle, initSVG, renderArrowMarker, renderBfsButton, renderInfoText, renderMatrixGraph, renderQueue, renderAdLGraph } from "../renderers/graph-bfs-renderer.js";
+import { executeAllBfsSteps, executeBfsStep, undoBfsStep,  renderBfsTitle, renderArrowMarker, renderBfsButton, renderInfoText, renderMatrixGraph, renderQueue, renderAdLGraph } from "../renderers/graph-bfs-renderer.js";
 import { graph } from "../shared/state.js";
+import { initSVG } from "../shared/svg-utils.js";
 //为button加载监听器
 export function bindBfsButtons(svg:SVGSVGElement,bfsRuntime:Runtime){
   const btnNext = document.getElementById("btn_next");

@@ -40,4 +40,11 @@ function initLine(line:SVGLineElement,x1:number,y1:number,x2:number,y2:number,co
     line.setAttribute("stroke",color);
     line.setAttribute("stroke-width",`${stroke_width}`);
 }
-export{wait,initSVG,initRect,initText,initLine}
+//获取svg画布中鼠标点击的坐标
+function getSVGPoint(svg:SVGSVGElement,event:MouseEvent):SVGPoint{
+  const pt = svg.createSVGPoint();
+  pt.x = event.clientX;
+  pt.y = event.clientY;
+  return pt.matrixTransform(svg.getScreenCTM()!.inverse());
+}
+export{wait,initSVG,initRect,initText,initLine,getSVGPoint}
